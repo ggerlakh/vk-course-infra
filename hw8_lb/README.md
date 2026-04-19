@@ -1,7 +1,7 @@
 ## HW10
 
 Общая схема создаваемых ресурсов
-![hw10_scheme](../img/hw10_scheme.jpg)
+![hw8_lb](../img/hw8_lb.png)
 
 Перед запуском нужно:
 1. Установить следующие переменные окружения
@@ -12,11 +12,10 @@
     export TF_VAR_provider_auth_url="<provider_auth_url>"
     export TF_VAR_provider_region="<provider_region>" # опционально, по умолчанию "RegionOne"
     export TF_VAR_availability_zone="<availability_zone>" # опционально, по умолчанию "GZ1"
+    export TF_VAR_availability_zone_2="<availability_zone>" # опционально, по умолчанию "MS1"
     export TF_VAR_stand_name="<stand_name>" # опционально, по умолчанию "test"
     export TF_VAR_private_subnet="<private_subnet>" # опционально, по умолчанию "192.168.1.0/24"
     export TF_VAR_compute_count="<compute_count>" # опционально, по умолчанию "2"
-    export TF_VAR_lb_listener_port="<lb_listener_port>" # опционально, по умолчанию "80"
-    export TF_VAR_lb_member_port="<lb_member_portt>" # опционально, по умолчанию "80"
     ```
 2. Проинициализировать terraform-провайдер
    ```bash
