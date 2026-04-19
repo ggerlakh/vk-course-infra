@@ -2,11 +2,10 @@
 package_update: true
 package_upgrade: false
 packages:
-  - chrony
   - nginx
 
 write_files:
-  - path: /var/www/html/index.html
+  - path: /var/www/html/index_8080.html
     owner: root:root
     permissions: "0644"
     content: |
@@ -17,33 +16,63 @@ write_files:
         <title>It works</title>
       </head>
       <body>
-        <h1>Nginx установлен и работает, сервер: ${server_num}</h1>
+        <h1>Nginx установлен и работает, сервер: ${hostname}:8080</h1>
         <p>Эта страница создана через cloud-init user-data.</p>
       </body>
       </html>
 
-  - path: /etc/chrony/sources.d/terraform.sources
+  - path: /var/www/html/index_8081.html
     owner: root:root
     permissions: "0644"
     content: |
-%{ for p in ntp_pools ~}
-      pool ${p} iburst
-%{ endfor ~}
+      <!doctype html>
+      <html lang="ru">
+      <head>
+        <meta charset="utf-8" />
+        <title>It works</title>
+      </head>
+      <body>
+        <h1>Nginx установлен и работает, сервер: ${hostname}:8081</h1>
+        <p>Эта страница создана через cloud-init user-data.</p>
+      </body>
+      </html>
 
-  - path: /etc/chrony/conf.d/99-terraform.conf
+  - path: /etc/nginx/sites-enabled/default
     owner: root:root
-    permissions: "0644"
+    permissions: "0777"
     content: |
-      # Доп. настройки (пример)
-      driftfile /var/lib/chrony/chrony.drift
-      makestep 1.0 3
-      rtcsync
+      server {
+          listen 8080 default_server;
+          listen [::]:8080 default_server;
+
+          root /var/www/html;
+
+          index index_8080.html;
+
+          server_name _;
+
+          location / {
+              try_files $uri $uri/ = 404;
+          }
+      }
+
+      server {
+          listen 8081 default_server;
+          listen [::]:8081 default_server;
+
+          root /var/www/html;
+
+          index index_8081.html;
+
+          server_name _;
+
+          location / {
+              try_files $uri $uri/ = 404;
+          }
+      }
+
 
 runcmd:
-  - [ bash, -lc, "timedatectl set-timezone ${timezone}" ]
-  - [ bash, -lc, "systemctl enable --now chrony" ]
-  - [ bash, -lc, "chronyc sources -v || true" ]
-  - [ bash, -lc, "chronyc tracking || true" ]
   - systemctl enable --now nginx
   - nginx -t
   - systemctl reload nginx

@@ -46,13 +46,19 @@ resource "vkcs_networking_port" "port" {
     ]
 }
 
-# Allocate a floating IP with a port
-resource "vkcs_networking_floatingip" "associated_fip" {
-  pool    = "internet"
-}
+resource "vkcs_networking_anycastip" "anycastip" {
+  name        = "lb-anycast-ip"
+  description = "lb-anycast-ip"
 
-# Associate floating IP with LB
-resource "vkcs_networking_floatingip_associate" "fip" {
-  floating_ip = vkcs_networking_floatingip.associated_fip.address
-  port_id = vkcs_lb_loadbalancer.loadbalancer.vip_port_id
+  network_id = data.vkcs_networking_network.extnet.id
+  associations = [
+    {
+      id   = vkcs_lb_loadbalancer.lb1.vip_port_id
+      type = "octavia"
+    },
+    {
+      id   = vkcs_lb_loadbalancer.lb2.vip_port_id
+      type = "octavia"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 resource "vkcs_compute_instance" "compute" {
   count                   = var.compute_count
-  name                    = "test-vm-${count.index + 1}"
+  name                    = "host${count.index + 1}"
   flavor_id               = data.vkcs_compute_flavor.minimal.id
   key_pair                = vkcs_compute_keypair.default_key_pair.name
   config_drive            = "true"
@@ -8,7 +8,7 @@ resource "vkcs_compute_instance" "compute" {
         data.vkcs_networking_secgroup.ssh.id,
         vkcs_networking_secgroup.secgroup_http.id
     ]
-  availability_zone       = var.availability_zone
+  availability_zone       = count.index == 0 ? var.availability_zone : var.availability_zone_2
   block_device {
     uuid                  = data.vkcs_images_image.ubuntu.id
     source_type           = "image"
@@ -23,14 +23,8 @@ resource "vkcs_compute_instance" "compute" {
   }
 
   user_data = templatefile("user-data.yaml.tftpl", {
-    ntp_pools = [
-      "0.pool.ntp.org",
-      "1.pool.ntp.org",
-      "2.pool.ntp.org",
-      "3.pool.ntp.org",
-    ]
-    timezone = "Europe/Moscow"
-    server_num = "test-vm-${count.index + 1}"
+    hostname = "host${count.index + 1}"
+    # app_port = count.index == 0 ? 8080 : 8081
   })
 
   depends_on = [

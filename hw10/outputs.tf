@@ -2,8 +2,8 @@ output "instance_ip" {
   value = [for i in vkcs_compute_instance.compute : i.access_ip_v4]
 }
 
-output "floating_ip" {
-  value = vkcs_networking_floatingip.associated_fip.address
+output "anycast_ip" {
+  value = vkcs_networking_anycastip.anycastip.ip_address
 }
 
 # To list value use: terraform output -raw private_key
@@ -12,6 +12,10 @@ output "private_key" {
   sensitive = true
 }
 
-output "vip_address" {
-  value = vkcs_lb_loadbalancer.loadbalancer.vip_address
+output "lb1_vip_address" {
+  value = vkcs_lb_loadbalancer.lb1.vip_address
+}
+
+output "lb2_vip_address" {
+  value = vkcs_lb_loadbalancer.lb1.vip_address
 }

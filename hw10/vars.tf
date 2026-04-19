@@ -27,9 +27,15 @@ variable "provider_region" {
 }
 
 variable "availability_zone" {
-    description = "Availability zone for all resources"
+    description = "Main availability zone for lb and copmutes"
     type        = string
     default     = "GZ1"
+}
+
+variable "availability_zone_2" {
+    description = "Fallback availability zone for lb and copmutes"
+    type        = string
+    default     = "MS1"
 }
 
 variable "stand_name" {
